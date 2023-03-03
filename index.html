@@ -15,7 +15,12 @@
 </head>
 <body>
     <input type="file" accept=".json" id="fileInp">
-    <div id="map" style="height: 700px;"></div>
+    <input type="text" id="start">
+    <input type="text" id="end">
+    <button onclick="find()">Go</button>
+    <button onclick="prev()">&lt--</button>
+    <button onclick="next()">--&gt</button>
+    <div id="map" style="height: 900px;"></div>
     <script src="main.js"></script>
 </body>
 </html>
