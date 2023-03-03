@@ -1,8 +1,4 @@
-pathD = new Array()
-curNode = null
 graph = {}
-node = null
-curFloorId = null
 mergeData = null
 navArray = null
 
@@ -60,9 +56,16 @@ class navPoint {
     this.pathNode1 = pathNode
   }
 
+  clearMap()
+  {
+    map.eachLayer(function (layer) {
+      map.removeLayer(layer);
+    });
+  }
+
   setMap()
   {
-    clearMap()
+    this.clearMap()
     var bounds = [[0,0], [this.res.height, this.res.width]];
     var image = L.imageOverlay('demoMaps/'+ this.floorId +'.png', bounds).addTo(map);
     map.fitBounds(bounds);
@@ -208,7 +211,7 @@ function addPlacesToGraph(start, end)
 
 function updateGraph(name)
 {
-  place = mergeData["places"][name] //getPlaceFromName(name, floor)
+  place = mergeData["places"][name]
   costs = {}
   
   entries = Object.keys(mergeData["floors"][place.floorId]["entries"])
@@ -229,168 +232,6 @@ function updateGraph(name)
 
   }
 
-}
-
-function nav2D(floorId, startX, startY, endX, endY)
-{
-  clearMap()
-  curFloor = getFloorData(floorId)
-  var bounds = [[0,0], [curFloor.res.height,curFloor.res.width]];
-  var image = L.imageOverlay('demoMaps/'+ floorId +'.png', bounds).addTo(map);
-  map.fitBounds(bounds);
-  pathToPol(findPath(curFloor.grid, startX, startY, endX, endY), floor)
-}
-
-function nav()
-{
-  console.log(curNode)
-
-  if (curNode != 0 && (curNode != pathD.length - 1))
-  {
-    curFloorId = getFloorFromCode(pathD[curNode])
-    floor = getFloorData(curFloorId)
-    node = getEntry(pathD[curNode], floor)
-  } else
-  {
-    floor = getFloorData(getFloorFromPlace(pathD[curNode]))
-    node = getPlaceFromName(pathD[curNode], floor)
-    curFloorId = floor.id
-  }
-  
-
-  next = pathD[curNode + 1] || -1
-  if (next != -1)
-  {
-
-    if (curFloorId == getFloorFromCode(next) || curNode == pathD.length-2)
-    {
-      nextNode = getNextNode(next)
-      nav2D(curFloorId, node.cords.x, node.cords.y, nextNode.cords.x, nextNode.cords.y)
-    } else
-    {
-      showPoint(floor, node, curNode)
-    }
-  } else
-  {
-    showPoint(floor, node, "Finish")
-  }
-}
-
-function front()
-{
-  curNode++
-  updateCurNode()
-  if (pathD[curNode]!= undefined)
-  {
-    next = pathD[curNode + 1]
-    nextNode = getNextNode(next)
-    while(curNode == pathD.length-2)
-    {
-      
-      if (curFloorId != getFloorFromCode(next))
-      {
-        curNode++
-        updateCurNode()
-        next = pathD[curNode + 1] || -1
-      }else{ break}
-    }
-    
-    nav()
-  }
-}
-
-function updateCurNode()
-{
-  if (curNode != 0 && (curNode != pathD.length - 1))
-  {
-    curFloorId = getFloorFromCode(pathD[curNode])
-    floor = getFloorData(curFloorId)
-    node = getEntry(pathD[curNode], floor)
-  } else
-  {
-    floor = getFloorData(getFloorFromPlace(pathD[curNode]))
-    node = getPlaceFromName(pathD[curNode], floor)
-    curFloorId = floor.id
-  }
-}
-
-function getNextNode(next)
-{
-  if (curNode == pathD.length-2)
-  {
-    floor = getFloorData(curFloorId)
-    return getPlaceFromName(pathD[curNode], floor)
-  } else
-  {
-    floor =getFloorData(getFloorFromCode(next))
-    return getEntry(next, floor)
-  }
-}
-
-function clearMap()
-{
-  map.eachLayer(function (layer) {
-    map.removeLayer(layer);
-  });
-}
-
-function showPoint(floor, curEnt, text)
-{
-  clearMap()
-  var bounds = [[0,0], [floor.res.height,floor.res.width]];
-  var image = L.imageOverlay('demoMaps/'+ curFloorId +'.png', bounds).addTo(map);
-  map.fitBounds(bounds);
-  L.marker(L.latLng((floor.rows - curEnt.cords.y) * floor.nodeSize, curEnt.cords.x * floor.nodeSize)).addTo(map).bindPopup(text);
-}
-
-function getFloorData(floorId)
-{
-  for (i = 0; i < floorsN; i++)
-  {
-    if (JSONdata.floors[i].id == floorId)
-    {
-      return JSONdata.floors[i]
-    }
-  }
-}
-
-function getFloorFromCode(code)
-{
-  return code.split('_')[2]
-}
-
-function getEntry(code, floor)
-{
-  for (i = 0; i < floor.entries.length; i++)
-  {
-    if ( floor.entries[i].code == code)
-    {
-      return floor.entries[i]
-    }
-  }
-}
-
-function getFloorFromPlace(name)
-{
-  for (i = 0; i < JSONdata.places.length; i++)
-  {
-    if (name == JSONdata.places[i].name)
-    {
-      return JSONdata.places[i].floorId
-    }
-  }
-}
-
-function getPlaceFromName(name, floor)
-{
-  //console.log(floor)
-  for (i = 0; i < floor.places.length; i++)
-  {
-    if (name == floor.places[i].name)
-    {
-      return floor.places[i]
-    }
-  }
 }
 
 //////////
