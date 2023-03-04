@@ -8,9 +8,9 @@ class MapContrl {
     });
     }
   
-    setFloors(floors)
+    setFloors(data)
     {
-        this.floors = floors
+        this.data = data
     }
 
     clearMap()
@@ -24,8 +24,16 @@ class MapContrl {
     setMap(floorId)
     {
       this.clearMap()
-      var bounds = [[0,0], [this.floors[floorId].res.height, this.floors[floorId].res.width]];
+      var bounds = [[0,0], [this.data.floors[floorId].res.height, this.data.floors[floorId].res.width]];
       var image = L.imageOverlay('maps/'+ floorId +'.png', bounds).addTo(this.map);
       this.map.fitBounds(bounds);
+    }
+
+    marker(placeName)
+    {
+        let place = this.data.places[placeName]
+        let floorId = place.floorId
+        this.setMap(floorId)
+        L.marker(L.latLng((this.data.floors[floorId].rows - place.cords.y) * this.data.floors[floorId].nodeSize, place.cords.x * this.data.floors[floorId].nodeSize)).addTo(this.map).bindPopup(placeName);
     }
   }

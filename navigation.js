@@ -12,12 +12,8 @@ class Navig {
 
     find(start, end)
     {
-        //start = document.getElementById('start').value//"0_0_0"
-       // end = document.getElementById('end').value//"1_1_1"
-
         this.addPlacesToGraph(start, end)
 
-        
         this.pathD = this.graphD.findShortestPath(start, end)
         this.navArray = this.makeNav(this.getPathWithNodes(this.pathD))
         this.curNode = 0
@@ -29,17 +25,17 @@ class Navig {
     {
         let nodePath = new Array()
         start = this.data["places"][pathD[0]]
-        nodePath[0] = new pathNode(pathD[0], start.floorId, start.cords)
+        nodePath[0] = new pathNode(pathD[0], start.floorId, start.cords, pathD[0])
         
         let entry
         for(i = 1; i < pathD.length -1; i++)
         {
             entry = this.data["entries"][pathD[i]]
-            nodePath[i] = new pathEntryNode(pathD[i], entry.floorId, entry.cords, entry.level, entry.id)
+            nodePath[i] = new pathEntryNode(pathD[i], entry.floorId, entry.cords, entry.level, entry.id, entry.type)
         }
 
         end = this.data["places"][pathD[pathD.length - 1]]
-        nodePath[pathD.length - 1] = new pathNode(pathD[pathD.length - 1], end.floorId, end.cords)
+        nodePath[pathD.length - 1] = new pathNode(pathD[pathD.length - 1], end.floorId, end.cords, pathD[pathD.length - 1])
 
         return nodePath
     }
@@ -56,19 +52,32 @@ class Navig {
         {
             if(k%2==0)
             {
-            curFloor = this.data["floors"][nodePath[l].floorId]
-            navArray[k] = new navPath(mapContrl, curFloor.id, curFloor.rows, curFloor.res, curFloor.nodeSize, "Start", nodePath[l], "", nodePath[l + 1], curFloor.grid)
-            l++
-            k++
+                curFloor = this.data["floors"][nodePath[l].floorId]
+                let text = "Go from " + nodePath[l].text + " to " + nodePath[l + 1].text
+                navArray[k] = new navPath(mapContrl, curFloor.id, curFloor.rows, curFloor.res, curFloor.nodeSize, text, nodePath[l], nodePath[l + 1], curFloor.grid)
+                l++
+                k++
             } else
             {
-            while(nodePath[l].floorId != nodePath[l + 1].floorId)
-            {
-                l++
-            }
-            curFloor = this.data["floors"][nodePath[l].floorId]
-            navArray[k] = new navPoint(mapContrl, curFloor.id, curFloor.rows, curFloor.res, curFloor.nodeSize, "", nodePath[l])
-            k++
+                let direction
+                if(nodePath[l].floorId > nodePath[l + 1].floorId)
+                {
+                    direction = "down"
+                } else
+                {
+                    direction = "up"
+                }
+                let nFloors = 0
+                while(nodePath[l].floorId != nodePath[l + 1].floorId)
+                {
+                    l++
+                    nFloors++
+                }
+
+                curFloor = this.data["floors"][nodePath[l].floorId]
+                let text = "Go " + direction + " " + nFloors  + " floor/s"
+                navArray[k] = new navPoint(mapContrl, curFloor.id, curFloor.rows, curFloor.res, curFloor.nodeSize, text, nodePath[l])
+                k++
             }
         }
 
@@ -106,6 +115,10 @@ class Navig {
 
     }
 
+    getText()
+    {
+        return this.navArray[this.curNode].text
+    }
 
     next()
     {

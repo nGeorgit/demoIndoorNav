@@ -15,15 +15,18 @@
 </head>
 <body>
     <input type="file" accept=".json" id="fileInp">
-    <input type="text" id="start">
-    <input type="text" id="end">
+    <select id="start" name="start"> 
+    </select>
+    <select id="end" name="end"> 
+    </select>
     <button onclick="find()">Go</button>
     <button onclick="prev()">&lt--</button>
     <button onclick="next()">--&gt</button>
+    <h3 id="order"></h3>
 
     <select id="maps" name="maps"> 
     </select>
-    
+
     <div id="map" style="height: 900px;"></div>
 
     <script src="navAlgorithms/dijkstra.js"></script>
