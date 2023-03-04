@@ -1,9 +1,8 @@
 
 class navPath extends navPoint {
-    constructor(mapContrl, floorId, rows, res, nodeSize, text1, pathNode1, text2, pathNode2, grid)
+    constructor(mapContrl, floorId, rows, res, nodeSize, text, pathNode1, pathNode2, grid)
     {
-      super(mapContrl, floorId, rows, res, nodeSize, text1, pathNode1)
-      this.text2 = text2
+      super(mapContrl, floorId, rows, res, nodeSize, text, pathNode1)
       this.pathNode2 = pathNode2
       this.grid = grid
       this.path = this.findPath()
