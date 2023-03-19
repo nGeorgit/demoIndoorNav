@@ -4,42 +4,41 @@ navArray = null
 selectEl = document.getElementById("maps")
 startEl = document.getElementById("start")
 endEl = document.getElementById("end")
+mapEl = document.getElementById("map")
 mapContrl = new MapContrl()
 
 fileInp.onchange = evt => {
-    const [file] = fileInp.files
-    if (file) {
-        var reader = new FileReader();
-        reader.readAsText(file, "UTF-8");
-        reader.onload = function(e) {
-            JSONdata = e.target.result
-            JSONdata = JSON.parse(JSONdata)
-            mergeData = JSONdata
-            navig = new Navig(mergeData)
-            mapContrl.setFloors(mergeData)
-            setMapOptions(Object.keys(mergeData["floors"]))
-            setPlacesOptions(Object.keys(mergeData.places))
+  const [file] = fileInp.files
+  if (file) {
+    var reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function(e) {
+      JSONdata = e.target.result
+      mergeData = JSON.parse(JSONdata)
+      navig = new Navig(mergeData)
+      mapContrl.setNavig(navig)
+      setMapOptions(mergeData["floors"])
+      setPlacesOptions(Object.keys(mergeData.places))
 
-        }
-       
     }
-    
+  }
 }
 
-function setMapOptions(options)
+function setMapOptions(options) //set floors on the drop down menu and show [0] map
 {
-  for (i in options)
+  for (i in Object.keys(options))
   {
+    console.log(options[i])
     optEl = document.createElement("option")
-    optEl.value = options[i]
-    optEl.innerHTML = options[i]
+    optEl.value = options[i].id
+    optEl.innerHTML = options[i].name
     selectEl.appendChild(optEl)
   }
-  mapContrl.setMap(options[0])
+  mapContrl.setMap(0)
 }
 
-function setPlacesOptions(options)
-{ 
+function setPlacesOptions(options) //set places on the drop down menu
+{
   for (i in options)
   {
     optEl = document.createElement("option")
@@ -47,7 +46,6 @@ function setPlacesOptions(options)
     optEl.innerHTML = options[i]
     endEl.appendChild(optEl)
     startEl.appendChild(optEl.cloneNode(true))
-    
   }
 }
 
@@ -56,26 +54,50 @@ selectEl.addEventListener("change", function() {
 });
 
 startEl.addEventListener("change", function() {
-  mapContrl.marker(startEl.value)
+  eventOption(startEl)
+  if (startEl.value == "setPoint") {
+    mapContrl.start = true
+    mapContrl.newPoint = true
+  }
 });
 
 startEl.addEventListener("click", function() {
-  mapContrl.marker(startEl.value)
+  eventOption(startEl)
 });
 
 endEl.addEventListener("change", function() {
-  mapContrl.marker(endEl.value)
+  eventOption(endEl)
+  if (endEl.value == "setPoint") {
+    mapContrl.start = false
+    mapContrl.newPoint = true
+  }
 });
 
 endEl.addEventListener("click", function() {
-  mapContrl.marker(endEl.value)
+  eventOption(endEl)
 });
+
+function eventOption(selEl)
+{
+  if(selEl.id == "start")
+  {
+    mapContrl.start = true
+  } else
+  {
+    mapContrl.start = false
+  }
+  if (selEl.value != "setPoint")
+  {
+    mapContrl.markerFromPlace(selEl.value)
+  }
+  selectEl.value = mapContrl.curFloor
+}
 
 function find()
 {
   start = document.getElementById('start').value//"0_0_0"
   end = document.getElementById('end').value//"1_1_1"
-  navig.find(start, end)
+  navig.find()
   setOrder(navig.getText())
 }
 
@@ -95,5 +117,8 @@ function setOrder(text)
 {
   orderEl = document.getElementById("order")
   orderEl.innerHTML = text
-
 }
+
+map.addEventListener("click", function(e) {
+  mapContrl.setMarker(e)
+})
