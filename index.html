@@ -14,7 +14,6 @@
     <script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
 </head>
 <body style="height: 100%">
-    <input type="file" accept=".json" id="fileInp">
     <a>Start:</a>
     <select id="start" name="start"> 
         <option value="setPoint">Set new point</option>
@@ -33,7 +32,8 @@
     </select>
 
     <div id="map" style="height: 100%"></div>
-
+    
+    <script src="mergeData.js"></script>
     <script src="navAlgorithms/dijkstra.js"></script>
     <script src="navAlgorithms/astar.js"></script>
     <script src="navNodes/navPoint.js"></script>

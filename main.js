@@ -7,22 +7,12 @@ endEl = document.getElementById("end")
 mapEl = document.getElementById("map")
 mapContrl = new MapContrl()
 
-fileInp.onchange = evt => {
-  const [file] = fileInp.files
-  if (file) {
-    var reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
-    reader.onload = function(e) {
-      JSONdata = e.target.result
-      mergeData = JSON.parse(JSONdata)
-      navig = new Navig(mergeData)
-      mapContrl.setNavig(navig)
-      setMapOptions(mergeData["floors"])
-      setPlacesOptions(Object.keys(mergeData.places))
+mergeData = JSON.parse(strMergeData)
+navig = new Navig(mergeData)
+mapContrl.setNavig(navig)
+setMapOptions(mergeData["floors"])
+setPlacesOptions(Object.keys(mergeData.places))
 
-    }
-  }
-}
 
 function setMapOptions(options) //set floors on the drop down menu and show [0] map
 {
