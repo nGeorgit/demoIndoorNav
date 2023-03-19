@@ -3,44 +3,45 @@ class Navig {
     constructor(data)
     {
         this.data = data
-        this.graph = data.graph
+        this.graph = JSON.parse(JSON.stringify(data.graph));
+        this.curNode = 0
+        this.graphD = new GraphD(this.graph)
         this.navArray
         this.pathD
-        this.curNode = 0
-        this.graphD = new GraphD(this.graph);
+        this.start
+        this.end
     }
 
-    find(start, end)
+    find()
     {
-        this.addPlacesToGraph(start, end)
-
-        this.pathD = this.graphD.findShortestPath(start, end)
+        this.graph = JSON.parse(JSON.stringify(this.data.graph));
+        this.graphD = new GraphD(this.graph)
+        this.addStartAndEnd()
+        
+        this.pathD = this.graphD.findShortestPath(this.start.type, this.end.type)
         this.navArray = this.makeNav(this.getPathWithNodes(this.pathD))
         this.curNode = 0
         this.navArray[this.curNode].show()
-
     }
-
+    
     getPathWithNodes(pathD)
     {
         let nodePath = new Array()
-        start = this.data["places"][pathD[0]]
-        nodePath[0] = new pathNode(pathD[0], start.floorId, start.cords, pathD[0])
-        
+        nodePath[0] = new pathNode(pathD[0], this.start.floorId, this.start.cords, this.start.name)
+
         let entry
         for(i = 1; i < pathD.length -1; i++)
         {
             entry = this.data["entries"][pathD[i]]
             nodePath[i] = new pathEntryNode(pathD[i], entry.floorId, entry.cords, entry.level, entry.id, entry.type)
         }
-
-        end = this.data["places"][pathD[pathD.length - 1]]
-        nodePath[pathD.length - 1] = new pathNode(pathD[pathD.length - 1], end.floorId, end.cords, pathD[pathD.length - 1])
+        nodePath[pathD.length - 1] = new pathNode(pathD[pathD.length - 1], this.end.floorId, this.end.cords, this.end.name)
 
         return nodePath
     }
 
-    
+
+
     makeNav(nodePath)
     {
         navArray = new Array()
@@ -80,19 +81,23 @@ class Navig {
                 k++
             }
         }
-
         return navArray
     }
 
-    addPlacesToGraph(start, end)
+    addStartAndEnd()
     {
-        this.updateGraph(start)
-        this.updateGraph(end)
+        this.updateGraph(this.start)
+        this.updateGraph(this.end)
+        if (this.end.floorId == this.start.floorId)
+        {
+            let cost = findPath(this.data["floors"][this.start.floorId].grid, this.start.cords.x, this.start.cords.y, this.end.cords.x, this.end.cords.y).length
+            this.graph[this.start.type][this.end.type] = cost
+            this.graph[this.end.type][this.start.type] = cost
+        }
     }
 
-    updateGraph(name)
+    updateGraph(place)
     {
-        let place = this.data["places"][name]
         let costs = {}
         
         let entries = Object.keys(this.data["floors"][place.floorId]["entries"])
@@ -103,16 +108,15 @@ class Navig {
             entry = this.data["entries"][entries[entName]]
             cost = findPath(this.data["floors"][place.floorId].grid, place.cords.x, place.cords.y, entry.cords.x, entry.cords.y).length
 
-            if (this.graph[name] == undefined)
+            if (this.graph[place.type] == undefined)
             {
-                this.graph[name] = {}
+                this.graph[place.type] = {}
             }
             
-            this.graph[name][entries[entName]] = cost
-            this.graph[entries[entName]][name] = cost
+            this.graph[place.type][entries[entName]] = cost
+            this.graph[entries[entName]][place.type] = cost
 
         }
-
     }
 
     getText()
