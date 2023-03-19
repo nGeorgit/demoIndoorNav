@@ -25,7 +25,7 @@ class navPath extends navPoint {
         pol[i] = L.latLng((this.rows - result[i].y) * this.nodeSize, result[i].x * this.nodeSize )
       }
     
-      L.polyline(pol, {"weight": 5, "opacity": 0.8}).addTo(this.mapContrl.map)
+      L.polyline(pol, {"weight": 10, "opacity": 0.8}).addTo(this.mapContrl.map)
     }
   
     show()
